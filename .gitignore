@@ -3,3 +3,10 @@
 __psycache__/
 
 .pytest_cache/
+
+.coverage
+
+htmlcov/
+
+
+
