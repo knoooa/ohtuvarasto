@@ -1,3 +1,3 @@
 # ohtuvarasto
 
-https://github.com/knoooa/ohtuvarasto/workflows/main.yml/badge.svg
+![Build Status](https://github.com/knoooa/ohtuvarasto/workflows/main.yml/badge.svg)
