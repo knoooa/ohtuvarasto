@@ -1,3 +1,3 @@
 # ohtuvarasto
 
-https://github.com/knoooa/ohtuvarasto/actions/workflows/main.yml/badge.svg
+https://github.com/knoooa/ohtuvarasto/workflows/main.yml/badge.svg
