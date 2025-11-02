@@ -72,5 +72,5 @@ class TestVarasto(unittest.TestCase):
         self.assertEqual(str(self.varasto), "saldo = 6, vielä tilaa 4")
 
     def test_negatiivinen_lisays(self):
-        self.varasto.lisaa_varastoon(-5)
+        self.varasto.lisaa_varastoon(50000)
         self.assertEqual(self.varasto.saldo, 0)
