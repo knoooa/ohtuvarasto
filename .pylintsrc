@@ -1,0 +1,12 @@
+[FORMAT]
+max-line-length=80
+
+indent-string='    '
+
+[REFACTORING]
+max-nested-blocks=2
+
+max-statements=10
+
+[MESSAGES CONTROL]
+max-complexity=8
