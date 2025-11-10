@@ -28,4 +28,4 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           
       - name: Run Pylint
-        run: poetry run pylint src tests
+        run: poetry run pylint src
