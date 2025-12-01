@@ -1,11 +1,26 @@
 """Flask web application for warehouse management"""
+import re
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from varasto import Varasto
 
 app = Flask(__name__)
 
 # In-memory storage for inventories
+# Note: This is ephemeral storage. Data will be lost when the server restarts.
+# For production use, consider implementing persistent storage (e.g., database).
 inventories = {}
+
+def validate_inventory_name(name):
+    """Validate inventory name to prevent injection and ensure reasonable format"""
+    if not name or not isinstance(name, str):
+        return False
+    # Only allow alphanumeric characters, spaces, hyphens, and underscores
+    # Maximum length of 50 characters
+    if len(name) > 50:
+        return False
+    if not re.match(r'^[a-zA-Z0-9\s\-_]+$', name):
+        return False
+    return True
 
 @app.route('/')
 def index():
@@ -20,6 +35,11 @@ def create_inventory():
 
     if not name:
         return jsonify({'error': 'Name is required'}), 400
+
+    if not validate_inventory_name(name):
+        error_msg = ('Invalid name. Use alphanumeric characters, spaces, '
+                     'hyphens, or underscores (max 50 chars)')
+        return jsonify({'error': error_msg}), 400
 
     if name in inventories:
         return jsonify({'error': 'Inventory already exists'}), 400
@@ -39,6 +59,11 @@ def edit_inventory(name):
     new_name = request.form.get('new_name', '').strip()
     if not new_name:
         return jsonify({'error': 'New name is required'}), 400
+
+    if not validate_inventory_name(new_name):
+        error_msg = ('Invalid name. Use alphanumeric characters, spaces, '
+                     'hyphens, or underscores (max 50 chars)')
+        return jsonify({'error': error_msg}), 400
 
     if new_name != name and new_name in inventories:
         return jsonify({'error': 'An inventory with that name already exists'}), 400
