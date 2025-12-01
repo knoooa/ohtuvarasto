@@ -1,6 +1,6 @@
 *.tmp
 
-__psycache__/
+__pycache__/
 
 .pytest_cache/
 

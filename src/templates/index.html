@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Warehouse Management System{% endblock %}
+
+{% block content %}
+<h1>🏭 Warehouse Management System</h1>
+
+<div style="text-align: center; margin-bottom: 30px;">
+    <button class="btn btn-primary" onclick="openCreateModal()">+ Create New Inventory</button>
+</div>
+
+{% if inventories %}
+<div class="inventory-grid">
+    {% for name, varasto in inventories.items() %}
+    <div class="card">
+        <h3 style="color: #667eea; margin-bottom: 15px;">{{ name }}</h3>
+        
+        <div class="inventory-info">
+            <p><strong>Capacity:</strong> {{ "%.2f"|format(varasto.tilavuus) }} units</p>
+            <p><strong>Current Balance:</strong> {{ "%.2f"|format(varasto.saldo) }} units</p>
+            <p><strong>Available Space:</strong> {{ "%.2f"|format(varasto.paljonko_mahtuu()) }} units</p>
+        </div>
+        
+        <div class="progress-bar">
+            {% set percentage = (varasto.saldo / varasto.tilavuus * 100) if varasto.tilavuus > 0 else 0 %}
+            <div class="progress-fill" style="width: {{ percentage }}%">
+                {{ "%.1f"|format(percentage) }}%
+            </div>
+        </div>
+        
+        <div class="inventory-actions">
+            <button class="btn btn-success" onclick="openAddModal('{{ name }}')">Add Items</button>
+            <button class="btn btn-warning" onclick="openRemoveModal('{{ name }}')">Remove Items</button>
+            <button class="btn btn-primary" onclick="openEditModal('{{ name }}')">Rename</button>
+            <button class="btn btn-danger" onclick="confirmDelete('{{ name }}')">Delete</button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div style="text-align: center; padding: 50px; color: #999;">
+    <h2>No inventories yet</h2>
+    <p>Click "Create New Inventory" to get started!</p>
+</div>
+{% endif %}
+
+<!-- Create Inventory Modal -->
+<div id="createModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('createModal')">&times;</span>
+        <h2>Create New Inventory</h2>
+        <form action="{{ url_for('create_inventory') }}" method="POST">
+            <div class="form-group">
+                <label for="name">Inventory Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="capacity">Capacity (units):</label>
+                <input type="number" id="capacity" name="capacity" step="0.01" min="0.01" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+    </div>
+</div>
+
+<!-- Add Items Modal -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('addModal')">&times;</span>
+        <h2>Add Items</h2>
+        <form id="addForm" method="POST">
+            <div class="form-group">
+                <label for="add_amount">Amount to Add:</label>
+                <input type="number" id="add_amount" name="amount" step="0.01" min="0.01" required>
+            </div>
+            <button type="submit" class="btn btn-success">Add</button>
+        </form>
+    </div>
+</div>
+
+<!-- Remove Items Modal -->
+<div id="removeModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('removeModal')">&times;</span>
+        <h2>Remove Items</h2>
+        <form id="removeForm" method="POST">
+            <div class="form-group">
+                <label for="remove_amount">Amount to Remove:</label>
+                <input type="number" id="remove_amount" name="amount" step="0.01" min="0.01" required>
+            </div>
+            <button type="submit" class="btn btn-warning">Remove</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Inventory Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('editModal')">&times;</span>
+        <h2>Rename Inventory</h2>
+        <form id="editForm" method="POST">
+            <div class="form-group">
+                <label for="new_name">New Name:</label>
+                <input type="text" id="new_name" name="new_name" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Rename</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function openCreateModal() {
+        document.getElementById('createModal').style.display = 'block';
+    }
+    
+    function openAddModal(inventoryName) {
+        const form = document.getElementById('addForm');
+        form.action = `/inventory/${encodeURIComponent(inventoryName)}/add`;
+        document.getElementById('addModal').style.display = 'block';
+    }
+    
+    function openRemoveModal(inventoryName) {
+        const form = document.getElementById('removeForm');
+        form.action = `/inventory/${encodeURIComponent(inventoryName)}/remove`;
+        document.getElementById('removeModal').style.display = 'block';
+    }
+    
+    function openEditModal(inventoryName) {
+        const form = document.getElementById('editForm');
+        form.action = `/inventory/${encodeURIComponent(inventoryName)}/edit`;
+        document.getElementById('new_name').value = inventoryName;
+        document.getElementById('editModal').style.display = 'block';
+    }
+    
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+    
+    function confirmDelete(inventoryName) {
+        if (confirm(`Are you sure you want to delete the inventory "${inventoryName}"?`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/inventory/${encodeURIComponent(inventoryName)}/delete`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        const modals = ['createModal', 'addModal', 'removeModal', 'editModal'];
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (event.target === modal) {
+                closeModal(modalId);
+            }
+        });
+    }
+</script>
+{% endblock %}
