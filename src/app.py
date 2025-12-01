@@ -127,4 +127,8 @@ if __name__ == '__main__':
     inventories['Beer'] = Varasto(100.0, 20.2)
     inventories['Milk'] = Varasto(50.0, 10.0)
 
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Run in development mode only when explicitly enabled
+    # For production, use a proper WSGI server like gunicorn
+    import os
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)

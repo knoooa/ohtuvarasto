@@ -28,7 +28,15 @@ cd src
 poetry run python app.py
 ```
 
+For development with debug mode enabled:
+```bash
+cd src
+FLASK_DEBUG=true poetry run python app.py
+```
+
 The application will be available at `http://localhost:5000`
+
+**Note:** Debug mode should never be enabled in production. For production deployments, use a proper WSGI server like gunicorn or uwsgi.
 
 ## Running Tests
 
